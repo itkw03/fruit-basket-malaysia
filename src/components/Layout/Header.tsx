@@ -9,9 +9,10 @@ interface HeaderProps {
   onShowFavorites?: () => void;
   onShowMyPurchases?: () => void;
   onShowSearch?: () => void;
+  onShowAboutUs?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onShowFullCatalogue, onShowFavorites, onShowMyPurchases, onShowSearch }) => {
+const Header: React.FC<HeaderProps> = ({ onShowFullCatalogue, onShowFavorites, onShowMyPurchases, onShowSearch, onShowAboutUs }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { cartItems, favorites, isMenuOpen, toggleMenu, toggleCart, auth } = useStore();
@@ -70,6 +71,12 @@ const Header: React.FC<HeaderProps> = ({ onShowFullCatalogue, onShowFavorites, o
   const handleSearchClick = () => {
     if (onShowSearch) {
       onShowSearch();
+    }
+  };
+
+  const handleAboutUsClick = () => {
+    if (onShowAboutUs) {
+      onShowAboutUs();
     }
   };
 
@@ -138,9 +145,9 @@ const Header: React.FC<HeaderProps> = ({ onShowFullCatalogue, onShowFavorites, o
             <button onClick={handleBestsellersClick} className="text-neutral-charcoal hover:text-primary-peach-coral transition-all duration-200 font-medium px-3 py-2 rounded-lg hover:shadow-md hover:bg-primary-light-peach/20">
               Bestsellers
             </button>
-            <a href="#about" className="text-neutral-charcoal hover:text-primary-peach-coral transition-all duration-200 font-medium px-3 py-2 rounded-lg hover:shadow-md hover:bg-primary-light-peach/20">
+            <button onClick={handleAboutUsClick} className="text-neutral-charcoal hover:text-primary-peach-coral transition-all duration-200 font-medium px-3 py-2 rounded-lg hover:shadow-md hover:bg-primary-light-peach/20">
               About
-            </a>
+            </button>
             <button onClick={handleContactClick} className="text-neutral-charcoal hover:text-primary-peach-coral transition-all duration-200 font-medium px-3 py-2 rounded-lg hover:shadow-md hover:bg-primary-light-peach/20">
               Contact
             </button>
@@ -299,9 +306,9 @@ const Header: React.FC<HeaderProps> = ({ onShowFullCatalogue, onShowFavorites, o
               <button onClick={() => { handleBestsellersClick(); toggleMenu(); }} className="text-neutral-charcoal hover:text-primary-peach-coral transition-all duration-200 font-medium py-2 px-3 rounded-lg hover:shadow-md hover:bg-primary-light-peach/20 text-left">
                 Bestsellers
               </button>
-              <a href="#about" className="text-neutral-charcoal hover:text-primary-peach-coral transition-all duration-200 font-medium py-2 px-3 rounded-lg hover:shadow-md hover:bg-primary-light-peach/20">
+              <button onClick={() => { handleAboutUsClick(); toggleMenu(); }} className="text-neutral-charcoal hover:text-primary-peach-coral transition-all duration-200 font-medium py-2 px-3 rounded-lg hover:shadow-md hover:bg-primary-light-peach/20 text-left">
                 About
-              </a>
+              </button>
               <button onClick={() => { handleContactClick(); toggleMenu(); }} className="text-neutral-charcoal hover:text-primary-peach-coral transition-all duration-200 font-medium py-2 px-3 rounded-lg hover:shadow-md hover:bg-primary-light-peach/20 text-left">
                 Contact
               </button>

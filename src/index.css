@@ -1,3 +1,61 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Polaroid Styles */
+@layer components {
+  .polaroid {
+    @apply bg-white p-4 pb-12 shadow-2xl;
+    transform: rotate(2deg);
+    transition: transform 0.5s ease;
+  }
+  
+  .polaroid:hover {
+    transform: rotate(0deg) scale(1.05);
+  }
+  
+  .polaroid-image {
+    @apply bg-neutral-ash/10 p-2;
+  }
+  
+  .polaroid-label {
+    @apply absolute bottom-2 left-4 right-4;
+  }
+  
+  .polaroid-label p {
+    @apply text-neutral-charcoal text-sm font-medium text-center;
+  }
+  
+  .polaroid-label .subtitle {
+    @apply text-neutral-ash text-xs text-center mt-1;
+  }
+}
+
+/* Custom animations for polaroid gallery */
+@keyframes polaroidFloat {
+  0%, 100% { 
+    transform: translateY(0px) rotate(var(--rotation, 0deg)); 
+  }
+  50% { 
+    transform: translateY(-10px) rotate(var(--rotation, 0deg)); 
+  }
+}
+
+.polaroid-float {
+  animation: polaroidFloat 3s ease-in-out infinite;
+}
+
+/* Enhanced shadow effects */
+.polaroid-shadow {
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.1),
+    0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
+.polaroid-shadow:hover {
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.15),
+    0 16px 32px rgba(0, 0, 0, 0.15),
+    0 32px 64px rgba(0, 0, 0, 0.15);
+}

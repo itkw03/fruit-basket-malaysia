@@ -14,6 +14,7 @@ import MyPurchasesPage from './components/Pages/MyPurchasesPage';
 import AdminDashboard from './components/Pages/AdminDashboard';
 import PaymentConfirmationPage from './components/Pages/PaymentConfirmationPage';
 import OrderTrackingPage from './components/Pages/OrderTrackingPage';
+import AboutUsPage from './components/Pages/AboutUsPage';
 import { useStore } from './store/useStore';
 import { mockProducts } from './data/mockData';
 import { Order } from './types';
@@ -26,6 +27,7 @@ function App() {
   const [showMyPurchases, setShowMyPurchases] = React.useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = React.useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
+  const [showAboutUs, setShowAboutUs] = React.useState(false);
   const [currentRoute, setCurrentRoute] = React.useState(window.location.pathname);
   const [orders, setOrders] = React.useState<Order[]>([]);
 
@@ -82,6 +84,13 @@ function App() {
   if (showMyPurchases) {
     return (
       <MyPurchasesPage onBackToHome={() => setShowMyPurchases(false)} />
+    );
+  }
+
+  // If showing about us, render that page instead
+  if (showAboutUs) {
+    return (
+      <AboutUsPage onBackToHome={() => setShowAboutUs(false)} />
     );
   }
 
@@ -153,6 +162,7 @@ function App() {
         onShowFavorites={() => setShowFavorites(true)} 
         onShowMyPurchases={() => setShowMyPurchases(true)} 
         onShowSearch={() => setShowSearch(true)} 
+        onShowAboutUs={() => setShowAboutUs(true)} 
       />
 
       {/* Main Content */}
