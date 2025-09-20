@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Heart, Users, Sparkles } from 'lucide-react';
+import { ArrowLeft, Heart, Users, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface AboutUsPageProps {
   onBackToHome: () => void;
@@ -22,18 +22,95 @@ const AboutUsPage: React.FC<AboutUsPageProps> = ({ onBackToHome }) => {
     'raya-basket.png'
   ];
 
-  const polaroidVariants = {
-    hidden: { opacity: 0, y: 50, rotate: -5 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      rotate: Math.random() * 10 - 5, // Random rotation between -5 and 5 degrees
-      transition: {
-        delay: i * 0.1,
-        duration: 0.6,
-        ease: "easeOut"
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Responsive items per view
+  const getItemsPerView = () => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 768) return 1; // Mobile: 1 item
+      if (window.innerWidth < 1024) return 2; // Tablet: 2 items
+      return 3; // Desktop: 3 items
+    }
+    return 3; // Default for SSR
+  };
+
+  const [itemsPerView, setItemsPerView] = useState(getItemsPerView());
+  const maxIndex = Math.max(0, basketImages.length - itemsPerView);
+
+  // Update items per view on window resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      setItemsPerView(getItemsPerView());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const nextSlide = () => {
+    setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex(prev => Math.max(prev - 1, 0));
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setCurrentX(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setCurrentX(e.clientX);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const diff = startX - currentX;
+    const threshold = 100;
+    
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
       }
-    })
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setCurrentX(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    setCurrentX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const diff = startX - currentX;
+    const threshold = 100;
+    
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
   };
 
   return (
@@ -144,53 +221,49 @@ const AboutUsPage: React.FC<AboutUsPageProps> = ({ onBackToHome }) => {
           transition={{ delay: 0.6, duration: 0.8 }}
         >
           <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
-                <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg">
-                  <h3 className="font-display text-2xl text-neutral-charcoal mb-4">
-                    The Beginning
-                  </h3>
-                  <p className="text-neutral-ash leading-relaxed">
-                    Fruit baskets were the natural choice in Malaysia, a gesture of care and sincerity. 
-                    But as they searched, they realised something was missing. Most fruit baskets looked 
-                    ordinary, sometimes even cheap, and rarely brought the kind of joy that flowers could.
-                  </p>
-                </div>
-                
-                <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg">
-                  <h3 className="font-display text-2xl text-neutral-charcoal mb-4">
-                    The Innovation
-                  </h3>
-                  <p className="text-neutral-ash leading-relaxed">
-                    So, they decided to make their own. They blended fresh fruits with beautiful floral 
-                    arrangements, creating baskets that not only nourished the body but also uplifted 
-                    the heart. The response was overwhelming.
-                  </p>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg h-full flex flex-col">
+                <h3 className="font-display text-2xl text-neutral-charcoal mb-4">
+                  The Beginning
+                </h3>
+                <p className="text-neutral-ash leading-relaxed flex-grow">
+                  Fruit baskets were the natural choice in Malaysia, a gesture of care and sincerity. 
+                  But as they searched, they realised something was missing. Most fruit baskets looked 
+                  ordinary, sometimes even cheap, and rarely brought the kind of joy that flowers could.
+                </p>
               </div>
               
-              <div className="space-y-6">
-                <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg">
-                  <h3 className="font-display text-2xl text-neutral-charcoal mb-4">
-                    The Mission
-                  </h3>
-                  <p className="text-neutral-ash leading-relaxed">
-                    What started as a passion project grew into a mission. They took up the challenge 
-                    of introducing this new way of gifting to Malaysia, believing wholeheartedly that 
-                    they were among the first to bring this trend to life.
-                  </p>
-                </div>
-                
-                <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg">
-                  <h3 className="font-display text-2xl text-neutral-charcoal mb-4">
-                    The Purpose
-                  </h3>
-                  <p className="text-neutral-ash leading-relaxed">
-                    At the heart of Fruitbasket Malaysia is a bigger purpose. Beyond making fruit baskets 
-                    look beautiful, the three ladies are driven by a passion to empower women, especially 
-                    those who are underprivileged or in need.
-                  </p>
-                </div>
+              <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg h-full flex flex-col">
+                <h3 className="font-display text-2xl text-neutral-charcoal mb-4">
+                  The Innovation
+                </h3>
+                <p className="text-neutral-ash leading-relaxed flex-grow">
+                  So, they decided to make their own. They blended fresh fruits with beautiful floral 
+                  arrangements, creating baskets that not only nourished the body but also uplifted 
+                  the heart. The response was overwhelming.
+                </p>
+              </div>
+              
+              <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg h-full flex flex-col">
+                <h3 className="font-display text-2xl text-neutral-charcoal mb-4">
+                  The Mission
+                </h3>
+                <p className="text-neutral-ash leading-relaxed flex-grow">
+                  What started as a passion project grew into a mission. They took up the challenge 
+                  of introducing this new way of gifting to Malaysia, believing wholeheartedly that 
+                  they were among the first to bring this trend to life.
+                </p>
+              </div>
+              
+              <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg h-full flex flex-col">
+                <h3 className="font-display text-2xl text-neutral-charcoal mb-4">
+                  The Purpose
+                </h3>
+                <p className="text-neutral-ash leading-relaxed flex-grow">
+                  At the heart of Fruitbasket Malaysia is a bigger purpose. Beyond making fruit baskets 
+                  look beautiful, the three ladies are driven by a passion to empower women, especially 
+                  those who are underprivileged or in need.
+                </p>
               </div>
             </div>
           </div>
@@ -211,41 +284,103 @@ const AboutUsPage: React.FC<AboutUsPageProps> = ({ onBackToHome }) => {
               Every basket we make carries our story of family, love, creativity, and a belief 
               that beauty and sincerity can change someone's day for the better.
             </p>
+            <p className="text-sm text-neutral-ash/70 mt-2 md:hidden">
+              Swipe left or right to explore our creations
+            </p>
           </div>
 
-          {/* Polaroid Gallery */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            {basketImages.map((image, index) => (
-              <motion.div
-                key={image}
-                className="flex justify-center"
-                variants={polaroidVariants}
-                initial="hidden"
-                animate="visible"
-                custom={index}
-                whileHover={{ 
-                  scale: 1.05, 
-                  rotate: 0,
-                  transition: { duration: 0.3 }
+          {/* Polaroid Carousel */}
+          <div className="relative max-w-6xl mx-auto">
+            {/* Navigation Buttons - Hidden on mobile */}
+            <button
+              onClick={prevSlide}
+              disabled={currentIndex === 0}
+              className={`hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm shadow-lg items-center justify-center transition-all duration-200 ${
+                currentIndex === 0 
+                  ? 'opacity-50 cursor-not-allowed' 
+                  : 'hover:bg-white hover:shadow-xl hover:scale-110'
+              }`}
+            >
+              <ChevronLeft className="w-6 h-6 text-neutral-charcoal" />
+            </button>
+            
+            <button
+              onClick={nextSlide}
+              disabled={currentIndex >= maxIndex}
+              className={`hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm shadow-lg items-center justify-center transition-all duration-200 ${
+                currentIndex >= maxIndex 
+                  ? 'opacity-50 cursor-not-allowed' 
+                  : 'hover:bg-white hover:shadow-xl hover:scale-110'
+              }`}
+            >
+              <ChevronRight className="w-6 h-6 text-neutral-charcoal" />
+            </button>
+
+            {/* Carousel Container */}
+            <div 
+              ref={carouselRef}
+              className="overflow-hidden"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <div 
+                className="flex transition-transform duration-300 ease-out"
+                style={{ 
+                  transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+                  cursor: isDragging ? 'grabbing' : 'grab'
                 }}
               >
-                <div className="bg-white p-3 pb-8 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                  <div className="bg-neutral-ash/10 p-1">
-                    <img
-                      src={`/About Us Images/${image}`}
-                      alt={`Beautiful fruit basket ${index + 1}`}
-                      className="w-full h-32 md:h-40 object-cover rounded-sm"
-                    />
+                {basketImages.map((image, index) => (
+                  <div 
+                    key={image}
+                    className="flex-shrink-0 px-4"
+                    style={{ width: `${100 / itemsPerView}%` }}
+                  >
+                    <motion.div
+                      className="flex justify-center"
+                      initial={{ opacity: 0, y: 50, rotate: Math.random() * 10 - 5 }}
+                      animate={{ opacity: 1, y: 0, rotate: Math.random() * 10 - 5 }}
+                      transition={{ delay: index * 0.1, duration: 0.6, ease: "easeOut" }}
+                      whileHover={{ 
+                        scale: 1.05, 
+                        rotate: 0,
+                        transition: { duration: 0.3 }
+                      }}
+                    >
+                      <div className="bg-white p-3 pb-6 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                        <div className="bg-neutral-ash/10 p-1">
+                          <img
+                            src={`/About Us Images/${image}`}
+                            alt={`Beautiful fruit basket ${index + 1}`}
+                            className="w-full h-48 md:h-56 object-cover rounded-sm"
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
                   </div>
-                  {/* Polaroid Label */}
-                  <div className="mt-2">
-                    <p className="text-neutral-charcoal text-xs font-medium text-center">
-                      {image.replace('.png', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Dots Indicator */}
+            <div className="flex justify-center mt-8 space-x-2">
+              {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                    index === currentIndex 
+                      ? 'bg-primary-peach-coral scale-125' 
+                      : 'bg-neutral-ash/30 hover:bg-neutral-ash/50'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </motion.section>
 
